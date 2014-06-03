@@ -35,3 +35,27 @@ The xapicmd jar at the root of the project is executable and contains all of the
 - open a command promt
 - navigate to the root project folder
 - run `> java -jar xapicmd-0.0.1-SNAPSHOT-jar-with-dependencies.jar`
+
+## Use
+This is a simple application shell allowing you to interact with the jxapi library. Use `?list` to show a current list of commands. Each xAPI endpoint is broken into its own sub shell.
+```
+> java -jar xapicmd-0.0.1-SNAPSHOT-jar-with-dependencies.jar 
+Welcome to the XAPICmd tool. Type '?list' for a list of commands.
+xAPI Commands
+xapi> ?list
+abbrev	name	params
+s	     statement	()
+c	     config	(endpoint, username, password)
+xapi> s
+Statements
+xapi/statements> ?list
+abbrev	name	params
+	      get	()
+xapi/statements> get
+4ccfa41f-6c4c-43e3-bb76-9d1146294449: Tyler Mulligan experienced How to Make French Toast Chapter: glossary, page: glossary
+0f22ac5e-2b98-4f2c-913e-ea62fa992cac: Tyler Mulligan experienced How to Make French Toast Chapter: glossary, page: butter
+6235e2bb-60c3-47b3-abea-1df90a5b989f: Tyler Mulligan experienced How to Make French Toast Chapter: glossary, page: glossary
+41ac4d11-bb08-46ac-ac49-dae25cb02faa: Tyler Mulligan experienced How to Make French Toast Chapter: glossary, page: bread
+2bd32329-cb16-4785-89c3-54794e23f518: Tyler Mulligan experienced How to Make French Toast Chapter: glossary, page: glossary
+...
+```
