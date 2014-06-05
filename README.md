@@ -59,3 +59,37 @@ xapi/statements> get
 2bd32329-cb16-4785-89c3-54794e23f518: Tyler Mulligan experienced How to Make French Toast Chapter: glossary, page: glossary
 ...
 ```
+### Statement Sub Shell
+The statement sub command shell allows interaction with the Statement endpoint.  
+Type s at the xapi shell prompt to enter the statement sub shell:  
+```
+xapi> s
+xapi/statements> 
+```   
+
+#### Statement Get
+From the statement sub shell you can issue GET requests to the LRS to retrieve statements:  
+```
+xapi/statements> get
+d6a21c06-ecd8-11e3-b464-005056a25e99: mailto:tom@example.com http://adlnet.gov/expapi/verbs/asked q://do/you/like/green-eggs-n-ham
+46f189cd-5371-407d-acd6-7848a6fcd814: Jason Haag experienced How to Make French Toast Chapter: toc, page: toc
+a73a5728-85ed-40a7-9752-45bba1a3cf84: Jason Haag experienced How to Make French Toast Chapter: toc, page: toc
+0bf118bb-3acf-4619-a509-5ddd541c44c0: Jason Haag experienced How to Make French Toast Chapter: toc, page: toc
+9cda8160-801e-4a19-9f6f-aa91eafc9ab9: Jason Haag experienced How to Make French Toast Chapter: toc, page: toc
+...
+```  
+It also supports some of the filter parameters [agent, verb, activity, related_agents, related_activities]:  
+```
+xapi/statements> get activity=act:adlnet.gov/JsTetris_XAPI related_activites=true
+aff4b15a-a2f6-4153-9e0c-8f1280ae6213: Andron Radu finished Js Tetris - xAPI Prototype
+02098b2c-d649-4c9b-ba70-c1dec8921bc1: Andron Radu started Js Tetris - xAPI Prototype
+732d9bd5-1822-4c7f-9028-017c654897ef: tom creighton started Js Tetris - xAPI Prototype
+...
+```  
+
+#### Statement Send
+From the statement sub shell you can issue POST requests to send a statement to the LRS:
+```
+xapi/statements> send '{"actor":{"mbox":"mailto:tom@example.com", "name":"tom"}, "verb":{"id":"http://tom.example.com/xapi/verbs/loves", "display":{"en-US":"loves"}}, "object":{"id":"http://i.luv.it/green-eggs-n-ham"}}'
+64913788-ecdc-11e3-b464-005056a25e99
+```
