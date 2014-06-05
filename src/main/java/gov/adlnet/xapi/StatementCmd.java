@@ -1,8 +1,12 @@
 package gov.adlnet.xapi;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import gov.adlnet.xapi.client.StatementClient;
 import gov.adlnet.xapi.model.Activity;
@@ -15,7 +19,10 @@ import gov.adlnet.xapi.model.StatementReference;
 import gov.adlnet.xapi.model.StatementResult;
 import gov.adlnet.xapi.model.SubStatement;
 import gov.adlnet.xapi.model.Verb;
+import gov.adlnet.xapi.model.adapters.ActorAdapter;
+import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
 import asg.cliche.Command;
+import asg.cliche.Param;
 
 public class StatementCmd {
    private StatementClient client;
@@ -28,15 +35,18 @@ public class StatementCmd {
    public StatementCmd(StatementClient client){
       this.client = client;
    }
-
-   /**
-    * Makes a GET request to the LRS
-    * @return the result
-    * @throws IOException 
-    */
+   
    @Command(name="get", description="Make a GET request for statements")
    public String doGet() throws IOException{
-      StatementResult results = client.getStatements();
+      return doGet(new String[]{});
+   }
+
+   @Command(name="get", description="Make a GET request for statements")
+   public String doGet(
+         @Param(name="filters", description="key=value pairs of space delimited filters to add to the get request")
+         String... filters) throws IOException{
+      StatementClient currentclient = addFilters(client, filters);
+      StatementResult results = currentclient.getStatements();
       StringBuilder sb = new StringBuilder();
       for (Statement s : results.getStatements()) {
          sb.append(getStatementVal(s) + "\n");
@@ -45,6 +55,43 @@ public class StatementCmd {
       return sb.toString();
    }
    
+   @Command(name="send", description="Send a statement to the LRS")
+   public String doSend(
+         @Param(name="statement", description="the json statement")
+         String stmtstr) throws UnsupportedEncodingException, IOException {
+      Statement stmt = getStatement(stmtstr);
+      return client.publishStatement(stmt);
+   }
+   
+   private Statement getStatement(String stmtstr) {
+      GsonBuilder builder = new GsonBuilder();
+      builder.registerTypeAdapter(IStatementObject.class, new StatementObjectAdapter());
+      builder.registerTypeAdapter(Actor.class, new ActorAdapter());
+      Gson gson = builder.create();
+      return (Statement)gson.fromJson(stmtstr, Statement.class);
+   }
+
+   private StatementClient addFilters(StatementClient c, String[] filters) {
+      StatementClient ret = client.exact(); // default.. just doing so i have a local config'd client
+      for (String f : filters) {
+         if (f.indexOf("=") < 0) continue;
+         String[] kv = f.split("=");
+         if ("agent".equals(kv[0])) ret = ret.filterByActor(getActor(kv[1]));
+         else if ("verb".equals(kv[0])) ret = ret.filterByVerb(kv[1]);
+         else if ("activity".equals(kv[0])) ret = ret.filterByActivity(kv[1]);
+         else if ("related_agents".equals(kv[0])) ret = ret.includeRelatedAgents(Boolean.valueOf(kv[1]));
+         else if ("related_activities".equals(kv[0])) ret = ret.includeRelatedActivities(Boolean.parseBoolean(kv[1]));
+      }
+      return ret;
+   }
+   
+   private Actor getActor(String actstr){
+      GsonBuilder builder = new GsonBuilder();
+      builder.registerTypeAdapter(Actor.class, new ActorAdapter());
+      Gson gson = builder.create();
+      return gson.fromJson(actstr, Agent.class);
+   }
+
    private String getStatementVal(Statement s){
       return s.getId() + ": " + 
             getActorVal(s.getActor()) + " " +
