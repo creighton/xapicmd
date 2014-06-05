@@ -40,6 +40,13 @@ public class StatementCmd {
    public String doGet() throws IOException{
       return doGet(new String[]{});
    }
+   
+   @Command(name="getstmt", description="Make a GET request for statements")
+   public String doGet(
+         @Param(name="statementid", description="The GUID of the statement you are requesting")
+         String stmtid) throws IOException{
+      return getStatementVal(client.get(stmtid));
+   }
 
    @Command(name="get", description="Make a GET request for statements")
    public String doGet(
