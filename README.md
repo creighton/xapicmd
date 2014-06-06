@@ -87,6 +87,20 @@ aff4b15a-a2f6-4153-9e0c-8f1280ae6213: Andron Radu finished Js Tetris - xAPI Prot
 ...
 ```  
 
+##### Get Single Statement by GUID  
+You can get a single statement by guid:
+```
+Welcome to the XAPICmd tool. Type '?list' for a list of commands.
+xAPI Commands
+xapi> s
+Statements
+xapi/statements> getstmt 22cdb531-2cae-4cb0-9214-d8c7dc5fc860
+22cdb531-2cae-4cb0-9214-d8c7dc5fc860: Rob rezzed Trapdoor2
+xapi/statements> exit
+xapi> exit
+Exiting XAPICmd tool.
+```
+
 #### Statement Send
 From the statement sub shell you can issue POST requests to send a statement to the LRS:
 ```
